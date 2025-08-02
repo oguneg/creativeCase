@@ -14,6 +14,14 @@ public class MultiplierGateHandler : MonoBehaviour
     void Start()
     {
         multiplierText.text = $"x{multiplier}";
+        if (isMoving)
+        {
+            transform.DOMoveX(maxX, moveSpeed).SetSpeedBased().SetEase(Ease.InOutSine)
+            .OnComplete(()=>
+            {
+                transform.DOMoveX(minX, moveSpeed).SetSpeedBased().SetEase(Ease.InOutSine).SetLoops(-1, LoopType.Yoyo);
+            });
+        }
     }
 
     public void Multiply(MobHandler mob)
