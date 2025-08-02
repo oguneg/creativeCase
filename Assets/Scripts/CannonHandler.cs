@@ -7,9 +7,16 @@ using DG.Tweening;
 public class CannonHandler : MonoBehaviour
 {
     [SerializeField] private float shootInterval;
+    private GameManager gameManager;
     private float lastShootTime;
     [SerializeField] private MobHandler mobPrefab;
     [SerializeField] private float moveSpeed, moveBoundX;
+
+    void Awake()
+    {
+        gameManager = GameManager.instance;
+    }
+
     public void Move(float x)
     {
         CheckShoot();
@@ -27,6 +34,15 @@ public class CannonHandler : MonoBehaviour
     {
         lastShootTime = Time.time;
         transform.DOScale(1.3f, 0.1f).SetLoops(2, LoopType.Yoyo).SetEase(Ease.InOutSine);
-        //Debug.Log("bam");
+        SpawnMob();
+    }
+
+    private void SpawnMob()
+    {
+        var mob = Instantiate(mobPrefab);
+        mob.transform.localScale = Vector3.zero;
+        mob.transform.position = transform.position;
+        gameManager.AddMob(mob);
+        mob.Initialize();
     }
 }
