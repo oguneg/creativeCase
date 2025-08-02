@@ -5,6 +5,8 @@ using UnityEngine;
 public class GameManager : MonoSingleton<GameManager>
 {
     [SerializeField] InputHandler inputHandler;
+    [SerializeField] private MobHandler mobPrefab;
+
     private List<MobHandler> activeMobList = new List<MobHandler>();
     int mobCount = 0;
     void Start()
@@ -31,5 +33,13 @@ public class GameManager : MonoSingleton<GameManager>
     {
         activeMobList.Remove(mob);
         mobCount--;
+    }
+
+    public MobHandler SpawnMob()
+    {
+        if (mobCount > 1000) return null;
+        var mob = Instantiate(mobPrefab);
+        AddMob(mob);
+        return mob;
     }
 }

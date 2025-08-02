@@ -13,7 +13,6 @@ public class CannonHandler : MonoBehaviour
     private GameManager gameManager;
     private float lastX;
     private float lastShootTime;
-    [SerializeField] private MobHandler mobPrefab;
     [SerializeField] private float moveSpeed, moveBoundX;
     [SerializeField] private Transform[] wheels;
     [SerializeField] private Transform spawnPoint;
@@ -49,17 +48,16 @@ public class CannonHandler : MonoBehaviour
     private void Shoot()
     {
         lastShootTime = Time.time;
-        cannonVisual.DOScale(0.12f, 0.075f).SetRelative().SetLoops(2, LoopType.Yoyo).SetEase(Ease.InOutSine);
-        cannonVisual.DOMoveZ(-0.45f, 0.075f).SetRelative().SetLoops(2, LoopType.Yoyo).SetEase(Ease.InOutSine);
+        cannonVisual.DOScale(0.08f, 0.075f).SetRelative().SetLoops(2, LoopType.Yoyo).SetEase(Ease.InOutSine);
+        cannonVisual.DOMoveZ(-0.35f, 0.075f).SetRelative().SetLoops(2, LoopType.Yoyo).SetEase(Ease.InOutSine);
         SpawnMob();
     }
 
     private void SpawnMob()
     {
-        var mob = Instantiate(mobPrefab);
+        var mob = gameManager.SpawnMob();
         mob.transform.localScale = Vector3.zero;
         mob.transform.position = spawnPoint.transform.position;
-        gameManager.AddMob(mob);
         mob.Initialize();
     }
 }
