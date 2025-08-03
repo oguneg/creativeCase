@@ -37,7 +37,14 @@ public class MobHandler : MonoBehaviour
 
     private void OnTriggerEnter(Collider col)
     {
-        if (!isPlayer) return;
+        if (!isPlayer)
+        {
+            if (col.CompareTag("PlayerLine"))
+            {
+                GameManager.instance.Defeat();
+            }
+        }
+        else
         if (canMultiply && col.CompareTag("Gate"))
         {
             col.GetComponent<MultiplierGateHandler>().Multiply(this);
@@ -47,14 +54,19 @@ public class MobHandler : MonoBehaviour
         {
             col.GetComponentInParent<TubeController>().SwallowMob(this);
         }
+        else if (col.CompareTag("EnemyBase"))
+        {
+            col.GetComponentInParent<EnemyBaseHandler>().Damage();
+            Die();
+        }
     }
 
     private void OnCollisionEnter(Collision other)
     {
         if (isPlayer && other.gameObject.CompareTag("Enemy"))
         {
-            Die();
             other.collider.GetComponent<MobHandler>().Die();
+            Die();
         }
     }
 
@@ -62,6 +74,6 @@ public class MobHandler : MonoBehaviour
     {
         gameObject.SetActive(false);
         GameManager.instance.KillMob(this);
-        Destroy(this);
+        Destroy(gameObject);
     }
 }

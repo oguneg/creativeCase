@@ -8,6 +8,8 @@ TagManager:
   - SplineEntrance
   - Gate
   - Enemy
+  - PlayerLine
+  - EnemyBase
   layers:
   - Default
   - TransparentFX
