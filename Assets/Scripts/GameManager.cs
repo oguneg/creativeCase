@@ -6,6 +6,7 @@ public class GameManager : MonoSingleton<GameManager>
 {
     [SerializeField] InputHandler inputHandler;
     [SerializeField] private MobHandler mobPrefab;
+    [SerializeField] private Transform enemyBase, playerBase;
 
     private List<MobHandler> activeMobList = new List<MobHandler>();
     int mobCount = 0;
@@ -35,10 +36,11 @@ public class GameManager : MonoSingleton<GameManager>
         mobCount--;
     }
 
-    public MobHandler SpawnMob()
+    public MobHandler SpawnMob(bool isEnemy = false)
     {
         if (mobCount > 1000) return null;
         var mob = Instantiate(mobPrefab);
+        mob.SetTarget(isEnemy ? playerBase.transform.position : enemyBase.transform.position);
         AddMob(mob);
         return mob;
     }

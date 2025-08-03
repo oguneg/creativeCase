@@ -10,17 +10,23 @@ public class MobHandler : MonoBehaviour
     private Vector3 target;
     const float speed = 5f;
     private bool canMultiply = false;
+    [SerializeField] private Rigidbody rb;
     public void Initialize(bool isMultiplied = false)
     {
         canMultiply = !isMultiplied;
         if (isMultiplied) StartCoroutine(MultiplyCooldown());
-        target = transform.position + Vector3.forward * 200;
+        //target = transform.position + Vector3.forward * 200;
         transform.DOScale(1f, 0.3f).SetEase(Ease.OutBounce);
+    }
+
+    public void SetTarget(Vector3 pos)
+    {
+        target = pos;
     }
 
     public void Tick()
     {
-        transform.position = Vector3.MoveTowards(transform.position, target, Time.deltaTime * speed);
+        rb.position = Vector3.MoveTowards(rb.position, target, Time.deltaTime * speed);
     }
 
     private IEnumerator MultiplyCooldown()
