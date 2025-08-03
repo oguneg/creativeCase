@@ -8,7 +8,7 @@ public class MobHandler : MonoBehaviour
 {
     public bool isPlayer;
     private Vector3 target;
-    const float speed = 5f;
+    const float speed = 6f;
     private bool canMultiply = false;
     [SerializeField] private Rigidbody rb;
     public void Initialize(bool isMultiplied = false)
@@ -26,7 +26,7 @@ public class MobHandler : MonoBehaviour
 
     public void Tick()
     {
-        rb.position = Vector3.MoveTowards(rb.position, target, Time.deltaTime * speed);
+        transform.position = Vector3.MoveTowards(transform.position, target, Time.deltaTime * speed);
     }
 
     private IEnumerator MultiplyCooldown()
@@ -72,7 +72,6 @@ public class MobHandler : MonoBehaviour
 
     public void Die()
     {
-        gameObject.SetActive(false);
         GameManager.instance.KillMob(this);
         Destroy(gameObject);
     }

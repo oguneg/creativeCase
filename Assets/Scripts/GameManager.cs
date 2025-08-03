@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class GameManager : MonoSingleton<GameManager>
@@ -9,7 +10,7 @@ public class GameManager : MonoSingleton<GameManager>
     [SerializeField] private Transform enemyBase, playerBase;
 
     private List<MobHandler> activeMobList = new List<MobHandler>();
-    int mobCount = 0;
+    [SerializeField] int mobCount = 0;
     void Start()
     {
         Application.targetFrameRate = 60;
@@ -18,11 +19,18 @@ public class GameManager : MonoSingleton<GameManager>
     void Update()
     {
         inputHandler.Tick();
-        for (int i = 0; i < mobCount; i++)
+
+        /*for (int i = 0; i < mobCount; i++)
         {
             activeMobList[i].Tick();
+        }*/
+
+        foreach (var element in activeMobList)
+        {
+            element.Tick();
         }
     }
+    
 
     public void AddMob(MobHandler mob)
     {

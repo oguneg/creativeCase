@@ -48,6 +48,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2386759431685384143, guid: 1b70b0ba9d4abbe41bce65ae72d7c3e2, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 86f20ccfb0d77dc45b491ad023cac2ac, type: 2}
     - target: {fileID: 5728029804071540857, guid: 1b70b0ba9d4abbe41bce65ae72d7c3e2, type: 3}
       propertyPath: m_Name
       value: EnemyMob
@@ -60,10 +64,14 @@ PrefabInstance:
       propertyPath: isPlayer
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7074872190674044173, guid: 1b70b0ba9d4abbe41bce65ae72d7c3e2, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 86f20ccfb0d77dc45b491ad023cac2ac, type: 2}
     - target: {fileID: 8282445393463175803, guid: 1b70b0ba9d4abbe41bce65ae72d7c3e2, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: 3a0511e322426e2409f7418fc3796530, type: 2}
+      objectReference: {fileID: 2100000, guid: 86f20ccfb0d77dc45b491ad023cac2ac, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
