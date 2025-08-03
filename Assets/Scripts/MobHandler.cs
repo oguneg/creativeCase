@@ -59,6 +59,11 @@ public class MobHandler : MonoBehaviour
             col.GetComponentInParent<EnemyBaseHandler>().Damage();
             Die();
         }
+                else if (col.CompareTag("Block"))
+        {
+            col.GetComponentInParent<BlockHandler>().Damage();
+            Die();
+        }
     }
 
     private void OnCollisionEnter(Collision other)

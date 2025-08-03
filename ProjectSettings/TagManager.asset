@@ -10,6 +10,7 @@ TagManager:
   - Enemy
   - PlayerLine
   - EnemyBase
+  - Block
   layers:
   - Default
   - TransparentFX
