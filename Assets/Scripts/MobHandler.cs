@@ -35,5 +35,10 @@ public class MobHandler : MonoBehaviour
         {
             col.GetComponent<MultiplierGateHandler>().Multiply(this);
         }
+
+        else if (col.CompareTag("SplineEntrance"))
+        {
+            col.GetComponentInParent<TubeController>().SwallowMob(this);
+        }
     }
 }
