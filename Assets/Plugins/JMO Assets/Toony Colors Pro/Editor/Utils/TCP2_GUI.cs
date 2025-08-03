@@ -1,5 +1,5 @@
 // Toony Colors Pro+Mobile 2
-// (c) 2014-2019 Jean Moreno
+// (c) 2014-2023 Jean Moreno
 
 using System;
 using System.Collections.Generic;
@@ -63,45 +63,6 @@ namespace ToonyColorsPro
 				return null;
 			}
 
-			/// <summary>
-			/// Generate a solid color texture using the alpha channel of the source
-			/// </summary>
-			public static Texture2D TextureCustomColor(Texture2D source, Color color)
-			{
-				int hash = source.GetHashCode() + color.GetHashCode();
-				if (customColorTextures.ContainsKey(hash))
-				{
-					if (customColorTextures[hash] != null)
-					{
-						return customColorTextures[hash];
-					}
-					else
-					{
-						customColorTextures.Remove(hash);
-					}
-				}
-
-				var tex2D = new Texture2D(source.width, source.height, source.format, false);
-				tex2D.name = source.name + " " + color;
-				tex2D.hideFlags = HideFlags.DontUnloadUnusedAsset;
-				var pixels = source.GetPixels32();
-				var color32 = (Color32)color;
-
-				for (int i = 0; i < pixels.Length; i++)
-				{
-					color32.a = pixels[i].a;
-					pixels[i] = color32;
-				}
-
-				tex2D.SetPixels32(pixels);
-				tex2D.Apply(false, true);
-
-				customColorTextures.Add(hash, tex2D);
-
-				return tex2D;
-			}
-			static Dictionary<int, Texture2D> customColorTextures = new Dictionary<int, Texture2D>();
-
 			private static GUIStyle _EnabledLabel;
 			private static GUIStyle EnabledLabel
 			{
@@ -141,8 +102,10 @@ namespace ToonyColorsPro
 					{
 						_ContextualHelpBox = new GUIStyle(EditorStyles.helpBox);
 						_ContextualHelpBox.normal.background = GetCustomTexture("TCP2_ContextualHelpBox");
-						_ContextualHelpBox.normal.textColor = EditorGUIUtility.isProSkin ? new Color32(120, 130, 150, 255) : new Color32(80, 90, 100, 255);
+						_ContextualHelpBox.normal.textColor = EditorGUIUtility.isProSkin ? new Color32(150, 170, 200, 255) : new Color32(80, 90, 100, 255);
 						_ContextualHelpBox.richText = true;
+						_ContextualHelpBox.alignment = TextAnchor.MiddleLeft;
+						_ContextualHelpBox.padding = new RectOffset(6, 6, 4, 4);
 					}
 					return _ContextualHelpBox;
 				}
@@ -246,6 +209,30 @@ namespace ToonyColorsPro
 					return _Tab;
 				}
 			}
+			private static GUIStyle _TabError;
+			
+			public static GUIStyle TabError
+			{
+				get
+				{
+					if (_TabError == null)
+					{
+						var red = EditorGUIUtility.isProSkin ? new Color(0.8f, 0.35f, 0.35f) : new Color(0.7f, 0.1f, 0.1f);
+						var redFocused = EditorGUIUtility.isProSkin ? new Color(1f, 0.35f, 0.35f) : new Color(0.9f, 0.1f, 0.1f);
+						
+						_TabError = new GUIStyle(Tab);
+						
+						_TabError.normal.textColor = red;
+						_TabError.focused.textColor = red;
+						_TabError.active.textColor = red;
+						
+						_TabError.onNormal.textColor = redFocused;
+						_TabError.onFocused.textColor = redFocused;
+						_TabError.onActive.textColor = redFocused;
+					}
+					return _TabError;
+				}
+			}
 
 			static GUIStyle ShurikenMiniButtonBorder(GUIStyle source)
 			{
@@ -324,6 +311,7 @@ namespace ToonyColorsPro
 
 						_HelpIcon2.normal.background = GetCustomTexture("TCP2_HelpIcon2");
 						_HelpIcon2.active.background = GetCustomTexture("TCP2_HelpIcon2_Down");
+						_HelpIcon2.hover.background = GetCustomTexture("TCP2_HelpIcon2_Hover");
 					}
 
 					return UseNewHelpIcon ? _HelpIcon2 : _HelpIcon;
@@ -368,20 +356,11 @@ namespace ToonyColorsPro
 				}
 			}
 
-			private static GUIStyle _HeaderLabel;
 			private static GUIStyle HeaderLabel
 			{
 				get
 				{
-					if (_HeaderLabel == null)
-					{
-						_HeaderLabel = new GUIStyle(EditorStyles.label);
-						_HeaderLabel.fontStyle = FontStyle.Bold;
-
-						var gray1 = EditorGUIUtility.isProSkin ? 0.7f : 0.35f;
-						_HeaderLabel.normal.textColor = new Color(gray1, gray1, gray1);
-					}
-					return _HeaderLabel;
+					return ToonyColorsPro.ShaderGenerator.SGUILayout.Styles.OrangeBoldLabel;
 				}
 			}
 
@@ -393,6 +372,8 @@ namespace ToonyColorsPro
 					if (_HeaderDropDown == null)
 					{
 						_HeaderDropDown = new GUIStyle(EditorStyles.foldout);
+
+						_HeaderDropDown.clipping = TextClipping.Clip;
 
 						_HeaderDropDown.focused.background = _HeaderDropDown.normal.background;
 						_HeaderDropDown.active.background = _HeaderDropDown.normal.background;
@@ -424,9 +405,11 @@ namespace ToonyColorsPro
 					{
 						_HeaderDropDownBold = new GUIStyle(HeaderDropDown);
 						_HeaderDropDownBold.fontStyle = FontStyle.Bold;
+						
+						_HeaderDropDownBold.clipping = TextClipping.Overflow;
 
-						var gray1 = EditorGUIUtility.isProSkin ? 0.6f : 0.3f;
-						var gray2 = EditorGUIUtility.isProSkin ? 0.5f : 0.45f;
+						var gray1 = EditorGUIUtility.isProSkin ? 0.7f : 0.3f;
+						var gray2 = EditorGUIUtility.isProSkin ? 0.6f : 0.45f;
 
 						var textColor = new Color(gray1, gray1, gray1);
 						var textColorActive = new Color(gray2, gray2, gray2);
@@ -464,64 +447,6 @@ namespace ToonyColorsPro
 				}
 			}
 
-			private static GUIStyle _HeaderDropDownBoldError;
-			public static GUIStyle HeaderDropDownBoldError
-			{
-				get
-				{
-					if (_HeaderDropDownBoldError == null)
-					{
-						_HeaderDropDownBoldError = new GUIStyle(HeaderDropDownBold);
-						var textColor = EditorGUIUtility.isProSkin ? new Color(0.85f, 0.1f, 0) : new Color(0.8f, 0, 0);
-						var textColorActive = EditorGUIUtility.isProSkin ? new Color(0.7f, 0.1f, 0) : new Color(1.0f, 0, 0);
-
-						_HeaderDropDownBoldError.normal.textColor = textColor;
-						_HeaderDropDownBoldError.onNormal.textColor = textColor;
-						_HeaderDropDownBoldError.focused.textColor = textColor;
-						_HeaderDropDownBoldError.onFocused.textColor = textColor;
-						_HeaderDropDownBoldError.active.textColor = textColorActive;
-						_HeaderDropDownBoldError.onActive.textColor = textColorActive;
-					}
-					return _HeaderDropDownBoldError;
-				}
-			}
-
-			private static GUIStyle _HeaderDropDownHighlighted;
-			private static GUIStyle HeaderDropDownHighlighted
-			{
-				get
-				{
-					if (_HeaderDropDownHighlighted == null)
-					{
-						_HeaderDropDownHighlighted = new GUIStyle(HeaderDropDownBold);
-
-						var textColor = EditorGUIUtility.isProSkin ? new Color(0.0f, 0.574f, 0.488f) : new Color(0.0f, 0.5f, 0.4f);
-						var textColorActive = EditorGUIUtility.isProSkin ? new Color(0.03f, 0.46f, 0.4f) : new Color(0.0f, 0.6f, 0.55f);
-
-						var arrowRight = TextureCustomColor(GetCustomTexture("TCP2_FoldoutArrowRightUnity"), textColor);
-						var arrowDown = TextureCustomColor(GetCustomTexture("TCP2_FoldoutArrowDownUnity"), textColor);
-						var arrowRightActive = TextureCustomColor(GetCustomTexture("TCP2_FoldoutArrowRightUnity"), textColorActive);
-						var arrowDownActive = TextureCustomColor(GetCustomTexture("TCP2_FoldoutArrowDownUnity"), textColorActive);
-
-						_HeaderDropDownHighlighted.normal.background = arrowRight;
-						_HeaderDropDownHighlighted.focused.background = _HeaderDropDownHighlighted.normal.background;
-						_HeaderDropDownHighlighted.active.background = arrowRightActive;
-
-						_HeaderDropDownHighlighted.onNormal.background = arrowDown;
-						_HeaderDropDownHighlighted.onFocused.background = _HeaderDropDownHighlighted.onNormal.background;
-						_HeaderDropDownHighlighted.onActive.background = arrowDownActive;
-
-						_HeaderDropDownHighlighted.normal.textColor = textColor;
-						_HeaderDropDownHighlighted.onNormal.textColor = textColor;
-						_HeaderDropDownHighlighted.focused.textColor = textColor;
-						_HeaderDropDownHighlighted.onFocused.textColor = textColor;
-						_HeaderDropDownHighlighted.active.textColor = textColorActive;
-						_HeaderDropDownHighlighted.onActive.textColor = textColorActive;
-					}
-					return _HeaderDropDownHighlighted;
-				}
-			}
-
 			private static GUIStyle _SubHeaderLabel;
 			private static GUIStyle SubHeaderLabel
 			{
@@ -531,7 +456,7 @@ namespace ToonyColorsPro
 					{
 						_SubHeaderLabel = new GUIStyle(EditorStyles.label);
 						_SubHeaderLabel.fontStyle = FontStyle.Normal;
-						_SubHeaderLabel.normal.textColor = EditorGUIUtility.isProSkin ? new Color(0.5f, 0.5f, 0.5f) : new Color(0.35f, 0.35f, 0.35f);
+						_SubHeaderLabel.normal.textColor = EditorGUIUtility.isProSkin ? new Color(0.65f, 0.65f, 0.65f) : new Color(0.35f, 0.35f, 0.35f);
 					}
 					return _SubHeaderLabel;
 				}
@@ -547,6 +472,7 @@ namespace ToonyColorsPro
 						_BigHeaderLabel = new GUIStyle(EditorStyles.largeLabel);
 						_BigHeaderLabel.fontStyle = FontStyle.Bold;
 						_BigHeaderLabel.fixedHeight = 30;
+						_BigHeaderLabel.normal.textColor = ToonyColorsPro.ShaderGenerator.SGUILayout.Styles.OrangeColor;
 					}
 					return _BigHeaderLabel;
 				}
@@ -610,6 +536,19 @@ namespace ToonyColorsPro
 					return _SmallHelpIconTexture;
 				}
 			}
+			
+			public static Texture2D _LayersIconTexture;
+			public static Texture2D LayersIconTexture
+			{
+				get
+				{
+					if (_LayersIconTexture == null)
+					{
+						_LayersIconTexture = GetCustomTexture("TCP2_LayerIcon");
+					}
+					return _LayersIconTexture;
+				}
+			}
 
 			public static Texture2D GetHelpBoxIcon(MessageType msgType)
 			{
@@ -624,6 +563,30 @@ namespace ToonyColorsPro
 				}
 
 				return null;
+			}
+
+			static Color hoverColor = new Color(0, 0, 0, 0.05f);
+			static Color hoverColorDark = new Color(1, 1, 1, 0.05f);
+			static Color HoverColor
+			{
+				get { return EditorGUIUtility.isProSkin ? hoverColorDark : hoverColor; }
+			}
+
+			public static void DrawHoverRect(Rect rect,
+#if UNITY_2019_3_OR_NEWER
+				float inset = 2
+#else
+				float inset = 0
+#endif
+				)
+			{
+				var mouseRect = rect;
+				mouseRect.yMax -= inset;
+				mouseRect.yMin += inset;
+				if (mouseRect.Contains(Event.current.mousePosition))
+				{
+					EditorGUI.DrawRect(rect, HoverColor);
+				}
 			}
 
 			//--------------------------------------------------------------------------------------------------
@@ -669,16 +632,7 @@ namespace ToonyColorsPro
 
 			public static void OpenHelp()
 			{
-				var rootDir = Utils.FindReadmePath();
-				if (rootDir == null)
-				{
-					EditorUtility.DisplayDialog("TCP2 Documentation", "Couldn't find TCP2 root folder! (the readme file is missing)\nYou can still access the documentation manually in the Documentation folder.", "Ok");
-				}
-				else
-				{
-					var helpLink = "file:///" + rootDir.Replace(@"\", "/") + "/Documentation/TCP2 Documentation.html";
-					Application.OpenURL(helpLink);
-				}
+				Application.OpenURL("https://jeanmoreno.com/unity/toonycolorspro/doc/");
 			}
 
 			//--------------------------------------------------------------------------------------------------
@@ -789,26 +743,63 @@ namespace ToonyColorsPro
 					EditorGUI.LabelField(position, header, HeaderLabel);
 			}
 
-			public static bool HeaderFoldout(bool foldout, GUIContent guiContent)
+			public static bool HeaderFoldout(bool foldout, GUIContent guiContent, bool drawHover = false)
 			{
-				foldout = EditorGUILayout.Foldout(foldout, guiContent, true, HeaderDropDownBold);
+				var position = GUILayoutUtility.GetRect(EditorGUIUtility.fieldWidth, EditorGUIUtility.fieldWidth, EditorGUIUtility.singleLineHeight, EditorGUIUtility.singleLineHeight, HeaderDropDownBold);
+				if (drawHover)
+				{
+					DrawHoverRect(position);
+				}
+				return HeaderFoldout(position, foldout, guiContent);
+			}
+
+			public static bool HeaderFoldout(Rect position, bool foldout, GUIContent guiContent)
+			{
+				foldout = EditorGUI.Foldout(position, foldout, guiContent, true, HeaderDropDownBold);
 				return foldout;
 			}
 
 			public static bool HeaderFoldoutHighlight(bool foldout, GUIContent guiContent, bool highlighted)
 			{
-				foldout = EditorGUILayout.Foldout(foldout, guiContent, true, highlighted ? HeaderDropDownHighlighted : HeaderDropDownBold);
+				var position = GUILayoutUtility.GetRect(EditorGUIUtility.fieldWidth, EditorGUIUtility.fieldWidth, EditorGUIUtility.singleLineHeight, EditorGUIUtility.singleLineHeight, HeaderDropDownBold);
+				return HeaderFoldoutHighlight(position, foldout, guiContent, highlighted);
+			}
+
+			public static bool HeaderFoldoutHighlight(Rect position, bool foldout, GUIContent guiContent, bool highlighted)
+			{
+				if (highlighted)
+				{
+					var highlightColor = EditorGUIUtility.isProSkin ? new Color(0.0f, 0.574f, 0.488f, 0.2f) : new Color(0.0f, 0.5f, 0.4f, 0.2f);
+					EditorGUI.DrawRect(position, highlightColor);
+				}
+
+				foldout = EditorGUI.Foldout(position, foldout, guiContent, true, HeaderDropDownBold);
 				return foldout;
 			}
 
 			public static bool HeaderFoldoutHighlightErrorGray(bool foldout, GUIContent guiContent, bool error, bool highlighted)
 			{
-				var style = error ? HeaderDropDownBoldError :
-					(highlighted ? HeaderDropDownHighlighted : HeaderDropDownBold);
+				var position = GUILayoutUtility.GetRect(EditorGUIUtility.fieldWidth, EditorGUIUtility.fieldWidth, EditorGUIUtility.singleLineHeight, EditorGUIUtility.singleLineHeight, HeaderDropDownBold);
+				return HeaderFoldoutHighlightErrorGrayPosition(position, foldout, guiContent, error, highlighted);
+			}
 
-				foldout = EditorGUILayout.Foldout(foldout, guiContent, true, style);
+			public static bool HeaderFoldoutHighlightErrorGrayPosition(Rect position, bool foldout, GUIContent guiContent, bool error, bool highlighted)
+			{
+				if (error)
+				{
+					var highlightColor = EditorGUIUtility.isProSkin ? new Color(0.85f, 0.1f, 0, 0.2f) : new Color(0.8f, 0, 0, 0.2f);
+					EditorGUI.DrawRect(position, highlightColor);
+				}
+				else if (highlighted)
+				{
+					var highlightColor = EditorGUIUtility.isProSkin ? new Color(0.0f, 0.574f, 0.488f, 0.2f) : new Color(0.0f, 0.5f, 0.4f, 0.2f);
+					EditorGUI.DrawRect(position, highlightColor);
+				}
+
+				foldout = EditorGUI.Foldout(position, foldout, guiContent, true, HeaderDropDownBold);
 				return foldout;
 			}
+
 
 			public static void SubHeaderGray(string header, string tooltip = null, bool expandWidth = false)
 			{
@@ -822,7 +813,7 @@ namespace ToonyColorsPro
 			{
 				HeaderAndHelp(header, null, helpTopic);
 			}
-			public static void HeaderAndHelp(string header, string tooltip, string helpTopic)
+			public static void HeaderAndHelp(string header, string tooltip, string helpTopic, GUIStyle style = null)
 			{
 				GUILayout.BeginHorizontal();
 				var r = GUILayoutUtility.GetRect(TempContent(header, tooltip), EditorStyles.label, GUILayout.ExpandWidth(true));
@@ -837,21 +828,25 @@ namespace ToonyColorsPro
 				GUI.Label(r, TempContent(header, tooltip), EditorStyles.boldLabel);
 				GUILayout.EndHorizontal();
 			}
-			public static void HeaderAndHelp(Rect position, string header, string tooltip, string helpTopic)
+			public static void HeaderAndHelp(Rect position, string header, string tooltip, string helpTopic, GUIStyle style = null)
 			{
 				if (!string.IsNullOrEmpty(helpTopic))
 				{
 					var btnRect = position;
 					btnRect.width = 16;
+					btnRect.y += 3;
+					btnRect.x -= 2;
 					//Button
 					if (GUI.Button(btnRect, TempContent("", "Help about:\n" + helpTopic), HelpIcon))
+					{
 						OpenHelpFor(helpTopic);
+					}
 				}
 
 				//Label
 				position.x += 16;
 				position.width -= 16;
-				GUI.Label(position, TempContent(header, tooltip), EditorStyles.boldLabel);
+				GUI.Label(position, TempContent(header, tooltip), style != null ? style : EditorStyles.boldLabel);
 			}
 
 			public static void HeaderBig(string header, string tooltip = null)
@@ -897,9 +892,30 @@ namespace ToonyColorsPro
 				GUI.Label(rect, guiContent, HelpBoxRichTextStyle);
 			}
 
+			public static bool HelpBoxWithButton(string message, string buttonLabel, float buttonWidth)
+			{
+				EditorGUILayout.HelpBox(message, MessageType.Info);
+				
+				var rect = GUILayoutUtility.GetLastRect();
+				rect.width -= buttonWidth;
+				rect.x += rect.width;
+				rect.width = buttonWidth - 4;
+				rect.yMin += 4;
+				rect.yMax -= 4;
+				
+				return GUI.Button(rect, TempContent(buttonLabel));
+			}
+
 			public static void ContextualHelpBoxLayout(string message, bool canHover = false)
 			{
-				EditorGUILayout.LabelField(GUIContent.none, TempContent(message, GetCustomTexture("TCP2_ContextIcon")), canHover ? ContextualHelpBoxHover : ContextualHelpBox);
+				var style = canHover ? ContextualHelpBoxHover : ContextualHelpBox;
+				var globalFont = GUI.skin.font;
+				GUI.skin.font = null;
+				int indentLevel = EditorGUI.indentLevel;
+				EditorGUI.indentLevel = 0;
+				EditorGUILayout.LabelField(GUIContent.none, TempContent(message, GetCustomTexture("TCP2_ContextIcon")), style);
+				EditorGUI.indentLevel = indentLevel;
+				GUI.skin.font = globalFont;
 			}
 
 			//----------------------
@@ -923,7 +939,7 @@ namespace ToonyColorsPro
 				var guiContents = new GUIContent[labels.Length];
 				for (var i = 0; i < guiContents.Length; i++)
 				{
-					guiContents[i] = TempContent(labels[i]);
+					guiContents[i] = new GUIContent(labels[i]);
 				}
 				return RadioChoice(choice, horizontal, guiContents);
 			}
@@ -979,8 +995,8 @@ namespace ToonyColorsPro
 
 		public class TCP2HeaderHelpDecorator : MaterialPropertyDrawer
 		{
-			protected readonly string header;
-			protected readonly string help;
+			readonly string header;
+			readonly string help;
 
 			public TCP2HeaderHelpDecorator(string header)
 			{
@@ -995,12 +1011,12 @@ namespace ToonyColorsPro
 
 			public override void OnGUI(Rect position, MaterialProperty prop, string label, MaterialEditor editor)
 			{
-				TCP2_GUI.HeaderAndHelp(position, header, null, help);
+				TCP2_GUI.HeaderAndHelp(position, header, null, help, ToonyColorsPro.ShaderGenerator.SGUILayout.Styles.OrangeBoldLabel);
 			}
 
 			public override float GetPropertyHeight(MaterialProperty prop, string label, MaterialEditor editor)
 			{
-				return 18f;
+				return EditorGUIUtility.singleLineHeight + 2;
 			}
 		}
 
@@ -1263,15 +1279,23 @@ namespace ToonyColorsPro
 
 		public class TCP2ColorNoAlphaDrawer : MaterialPropertyDrawer
 		{
+			readonly bool forceHdr;
+			
+			public TCP2ColorNoAlphaDrawer() { }
+			public TCP2ColorNoAlphaDrawer(string hdr)
+			{
+				forceHdr = hdr.ToUpperInvariant() == "HDR";
+			}
+			
 			public override void OnGUI(Rect position, MaterialProperty prop, GUIContent label, MaterialEditor editor)
 			{
 				//Code from ColorPropertyInternal, but with alpha turned off
 				EditorGUI.BeginChangeCheck();
 				EditorGUI.showMixedValue = prop.hasMixedValue;
-				bool hdr = (prop.flags & MaterialProperty.PropFlags.HDR) != MaterialProperty.PropFlags.None;
+				bool hdr = forceHdr || (prop.flags & MaterialProperty.PropFlags.HDR) != MaterialProperty.PropFlags.None;
 				bool showAlpha = false;
 #if UNITY_2018_1_OR_NEWER
-		Color colorValue = EditorGUI.ColorField(position, label, prop.colorValue, true, showAlpha, hdr);
+				Color colorValue = EditorGUI.ColorField(position, label, prop.colorValue, true, showAlpha, hdr);
 #else
 				Color colorValue = EditorGUI.ColorField(position, label, prop.colorValue, true, showAlpha, hdr, null);
 #endif
@@ -1297,18 +1321,18 @@ namespace ToonyColorsPro
 
 			public override void OnGUI(Rect position, MaterialProperty prop, string label, MaterialEditor editor)
 			{
-				float indent = EditorGUI.indentLevel * 16;
+				float indent = EditorGUI.indentLevel * 15;
 
 				//Label
 				var labelRect = position;
-				labelRect.height = 16f;
+				labelRect.height = EditorGUIUtility.singleLineHeight;
 				var space = labelRect.height + 4;
 				position.y += space - 3;
 				position.height -= space;
 				EditorGUI.PrefixLabel(labelRect, new GUIContent(label));
 
 				//Texture object field
-				position.height = 16f;
+				position.height = EditorGUIUtility.singleLineHeight;
 				var newTexture = (Texture)EditorGUI.ObjectField(position, prop.textureValue, typeof(Texture2D), false);
 				if (newTexture != prop.textureValue)
 				{
@@ -1336,8 +1360,8 @@ namespace ToonyColorsPro
 
 				//Edit button
 				var buttonRect = labelRect;
-				buttonRect.width = 70;
-				buttonRect.x = labelRect.x + (labelRect.width-150) - 18;
+				buttonRect.xMin += buttonRect.width - 200;
+				buttonRect.width /= 2;
 				if (GUI.Button(buttonRect, "Create New", EditorStyles.miniButtonLeft))
 				{
 					var lastSavePath = GradientManager.LAST_SAVE_PATH;
@@ -1363,23 +1387,22 @@ namespace ToonyColorsPro
 						prop.textureValue = texture;
 
 						//Open for editing
-						ToonyColorsPro.TCP2_RampGenerator.OpenForEditing(texture, editor.targets, true, !overwriteExistingFile);
+						TCP2_RampGenerator.OpenForEditing(texture, editor.targets, true, !overwriteExistingFile);
 					}
 				}
 				buttonRect.x += buttonRect.width;
-				buttonRect.width = 80;
 				var enabled = GUI.enabled;
 				GUI.enabled = (assetImporter != null) && (assetImporter.userData.StartsWith("GRADIENT") || assetImporter.userData.StartsWith("gradient:")) && !prop.hasMixedValue;
 				if (GUI.Button(buttonRect, GUI.enabled ? editButtonLabel : editButtonDisabledLabel, EditorStyles.miniButtonRight))
 				{
-					ToonyColorsPro.TCP2_RampGenerator.OpenForEditing((Texture2D)prop.textureValue, editor.targets, true, false);
+					TCP2_RampGenerator.OpenForEditing((Texture2D)prop.textureValue, editor.targets, true, false);
 				}
 				GUI.enabled = enabled;
 			}
 
 			public override float GetPropertyHeight(MaterialProperty prop, string label, MaterialEditor editor)
 			{
-				return 34f;
+				return EditorGUIUtility.singleLineHeight * 2.0f + EditorGUIUtility.standardVerticalSpacing;
 			}
 		}
 
@@ -1396,13 +1419,12 @@ namespace ToonyColorsPro
 
 			public override void OnGUI(Rect position, MaterialProperty prop, string label, MaterialEditor editor)
 			{
-				position.y += 2;
 				TCP2_GUI.Header(position, header);
 			}
 
 			public override float GetPropertyHeight(MaterialProperty prop, string label, MaterialEditor editor)
 			{
-				return 18f;
+				return EditorGUIUtility.singleLineHeight + 2;
 			}
 		}
 
@@ -1491,6 +1513,287 @@ namespace ToonyColorsPro
 			}
 		}
 
+		//----------------------------------------------------------------------------------------------------------------------------------------------------------------
+		// Same as Toggle drawer, with different label style
+		// Also acts as a no-keyword toggle if no keyword is specified
+
+		internal class TCP2HeaderToggleDrawer : MaterialPropertyDrawer
+		{
+			protected readonly string keyword;
+
+			public TCP2HeaderToggleDrawer()
+			{
+				keyword = null;
+			}
+
+			public TCP2HeaderToggleDrawer(string keyword)
+			{
+				this.keyword = keyword;
+			}
+
+			private static bool IsPropertyTypeSuitable(MaterialProperty prop)
+			{
+				return prop.type == MaterialProperty.PropType.Float || prop.type == MaterialProperty.PropType.Range;
+			}
+
+			public override float GetPropertyHeight(MaterialProperty prop, string label, MaterialEditor editor)
+			{
+				if (!IsPropertyTypeSuitable(prop))
+				{
+					return 40f;
+				}
+				return base.GetPropertyHeight(prop, label, editor);
+			}
+
+			public override void OnGUI(Rect position, MaterialProperty prop, GUIContent label, MaterialEditor editor)
+			{
+				if (!IsPropertyTypeSuitable(prop))
+				{
+					EditorGUI.HelpBox(position, "Toggle used on a non-float property: " + prop.name, MessageType.Warning);
+					return;
+				}
+				EditorGUI.BeginChangeCheck();
+				bool value = Math.Abs(prop.floatValue) > 0.001f;
+				EditorGUI.showMixedValue = prop.hasMixedValue;
+
+				var guiColor = GUI.color;
+				var guiColorA = guiColor;
+				guiColorA.a = 0.5f;
+				GUI.color = value ? guiColor : guiColorA;
+				Rect toggleRect = EditorGUI.PrefixLabel(position, label, ShaderGenerator.SGUILayout.Styles.OrangeBoldLabel);
+				GUI.color = guiColor;
+				value = EditorGUI.Toggle(toggleRect, GUIContent.none, value);
+
+				EditorGUI.showMixedValue = false;
+				if (EditorGUI.EndChangeCheck())
+				{
+					prop.floatValue = ((!value) ? 0f : 1f);
+					SetKeyword(prop, value);
+				}
+			}
+
+			public override void Apply(MaterialProperty prop)
+			{
+				base.Apply(prop);
+				if (IsPropertyTypeSuitable(prop) && !prop.hasMixedValue)
+				{
+					SetKeyword(prop, Math.Abs(prop.floatValue) > 0.001f);
+				}
+			}
+
+			protected void SetKeyword(MaterialProperty prop, bool on)
+			{
+				if (string.IsNullOrEmpty(keyword)) return;
+
+				UnityEngine.Object[] targets = prop.targets;
+				for (int i = 0; i < targets.Length; i++)
+				{
+					Material material = (Material)targets[i];
+					if (on)
+					{
+						material.EnableKeyword(keyword);
+					}
+					else
+					{
+						material.DisableKeyword(keyword);
+					}
+				}
+			}
+		}
+
+		//----------------------------------------------------------------------------------------------------------------------------------------------------------------
+		// Keyword Enum no Prefix
+		// Same as KeywordEnum drawer, but uses the keyword supplied as is rather than adding a prefix to them
+
+		internal class TCP2MaterialKeywordEnumNoPrefixDrawer : MaterialPropertyDrawer
+		{
+			private readonly GUIContent[] labels;
+			private readonly string[] keywords;
+
+			public TCP2MaterialKeywordEnumNoPrefixDrawer(string lbl1, string kw1) : this(new[] { lbl1 }, new[] { kw1 }) { }
+			public TCP2MaterialKeywordEnumNoPrefixDrawer(string lbl1, string kw1, string lbl2, string kw2) : this(new[] { lbl1, lbl2 }, new[] { kw1, kw2 }) { }
+			public TCP2MaterialKeywordEnumNoPrefixDrawer(string lbl1, string kw1, string lbl2, string kw2, string lbl3, string kw3) : this(new[] { lbl1, lbl2, lbl3 }, new[] { kw1, kw2, kw3 }) { }
+			public TCP2MaterialKeywordEnumNoPrefixDrawer(string lbl1, string kw1, string lbl2, string kw2, string lbl3, string kw3, string lbl4, string kw4) : this(new[] { lbl1, lbl2, lbl3, lbl4 }, new[] { kw1, kw2, kw3, kw4 }) { }
+			public TCP2MaterialKeywordEnumNoPrefixDrawer(string lbl1, string kw1, string lbl2, string kw2, string lbl3, string kw3, string lbl4, string kw4, string lbl5, string kw5) : this(new[] { lbl1, lbl2, lbl3, lbl4, lbl5 }, new[] { kw1, kw2, kw3, kw4, kw5 }) { }
+			public TCP2MaterialKeywordEnumNoPrefixDrawer(string lbl1, string kw1, string lbl2, string kw2, string lbl3, string kw3, string lbl4, string kw4, string lbl5, string kw5, string lbl6, string kw6) : this(new[] { lbl1, lbl2, lbl3, lbl4, lbl5, lbl6 }, new[] { kw1, kw2, kw3, kw4, kw5, kw6 }) { }
+			public TCP2MaterialKeywordEnumNoPrefixDrawer(string lbl1, string kw1, string lbl2, string kw2, string lbl3, string kw3, string lbl4, string kw4, string lbl5, string kw5, string lbl6, string kw6, string lbl7, string kw7) : this(new[] { lbl1, lbl2, lbl3, lbl4, lbl5, lbl6, lbl7 }, new[] { kw1, kw2, kw3, kw4, kw5, kw6, kw7 }) { }
+			public TCP2MaterialKeywordEnumNoPrefixDrawer(string lbl1, string kw1, string lbl2, string kw2, string lbl3, string kw3, string lbl4, string kw4, string lbl5, string kw5, string lbl6, string kw6, string lbl7, string kw7, string lbl8, string kw8) : this(new[] { lbl1, lbl2, lbl3, lbl4, lbl5, lbl6, lbl7, lbl8 }, new[] { kw1, kw2, kw3, kw4, kw5, kw6, kw7, kw8 }) { }
+
+			public TCP2MaterialKeywordEnumNoPrefixDrawer(string[] labels, string[] keywords)
+			{
+				this.labels= new GUIContent[keywords.Length];
+				this.keywords = new string[keywords.Length];
+				for (int i = 0; i < keywords.Length; ++i)
+				{
+					this.labels[i] = new GUIContent(labels[i]);
+					this.keywords[i] = keywords[i];
+				}
+			}
+
+			static bool IsPropertyTypeSuitable(MaterialProperty prop)
+			{
+				return prop.type == MaterialProperty.PropType.Float || prop.type == MaterialProperty.PropType.Range;
+			}
+
+			void SetKeyword(MaterialProperty prop, int index)
+			{
+				for (int i = 0; i < keywords.Length; ++i)
+				{
+					string keyword = GetKeywordName(prop.name, keywords[i]);
+					foreach (Material material in prop.targets)
+					{
+						if (keyword == "_")
+						{
+							continue;
+						}
+
+						if (index == i)
+							material.EnableKeyword(keyword);
+						else
+							material.DisableKeyword(keyword);
+					}
+				}
+			}
+
+			public override float GetPropertyHeight(MaterialProperty prop, string label, MaterialEditor editor)
+			{
+				if (!IsPropertyTypeSuitable(prop))
+				{
+					return EditorGUIUtility.singleLineHeight * 2.5f;
+				}
+				return base.GetPropertyHeight(prop, label, editor);
+			}
+
+			public override void OnGUI(Rect position, MaterialProperty prop, GUIContent label, MaterialEditor editor)
+			{
+				if (!IsPropertyTypeSuitable(prop))
+				{
+					EditorGUI.HelpBox(position, "Toggle used on a non-float property: " + prop.name, MessageType.Warning);
+					return;
+				}
+
+				EditorGUI.BeginChangeCheck();
+
+				EditorGUI.showMixedValue = prop.hasMixedValue;
+				var value = (int)prop.floatValue;
+				value = EditorGUI.Popup(position, label, value, labels);
+				EditorGUI.showMixedValue = false;
+				if (EditorGUI.EndChangeCheck())
+				{
+					prop.floatValue = value;
+					SetKeyword(prop, value);
+				}
+			}
+
+			public override void Apply(MaterialProperty prop)
+			{
+				base.Apply(prop);
+				if (!IsPropertyTypeSuitable(prop))
+					return;
+
+				if (prop.hasMixedValue)
+					return;
+
+				SetKeyword(prop, (int)prop.floatValue);
+			}
+
+			// Final keyword name: property name + "_" + display name. Uppercased,
+			// and spaces replaced with underscores.
+			private static string GetKeywordName(string propName, string name)
+			{
+				// Just return the supplied name
+				return name;
+
+				// Original code:
+				/*
+				string n = propName + "_" + name;
+				return n.Replace(' ', '_').ToUpperInvariant();
+				*/
+			}
+		}
+
+		//----------------------------------------------------------------------------------------------------------------------------------------------------------------
+		// Float enum with extended capacity
+		// Same as Unity's MaterialEnumDrawer but allowing up to 16 values, and without the built-in enum support
+
+		internal class MaterialTCP2EnumDrawer : MaterialPropertyDrawer
+		{
+			private readonly GUIContent[] names;
+			private readonly float[] values;
+
+			public MaterialTCP2EnumDrawer(string n1, float v1) : this(new string[] { n1 }, new float[] { v1 }) { }
+			public MaterialTCP2EnumDrawer(string n1, float v1, string n2, float v2) : this(new string[] { n1, n2 }, new float[] { v1, v2 }) { }
+			public MaterialTCP2EnumDrawer(string n1, float v1, string n2, float v2, string n3, float v3) : this(new string[] { n1, n2, n3 }, new float[] { v1, v2, v3 }) { }
+			public MaterialTCP2EnumDrawer(string n1, float v1, string n2, float v2, string n3, float v3, string n4, float v4) : this(new string[] { n1, n2, n3, n4 }, new float[] { v1, v2, v3, v4 }) { }
+			public MaterialTCP2EnumDrawer(string n1, float v1, string n2, float v2, string n3, float v3, string n4, float v4, string n5, float v5) : this(new string[] { n1, n2, n3, n4, n5 }, new float[] { v1, v2, v3, v4, v5 }) { }
+			public MaterialTCP2EnumDrawer(string n1, float v1, string n2, float v2, string n3, float v3, string n4, float v4, string n5, float v5, string n6, float v6) : this(new string[] { n1, n2, n3, n4, n5, n6 }, new float[] { v1, v2, v3, v4, v5, v6 }) { }
+			public MaterialTCP2EnumDrawer(string n1, float v1, string n2, float v2, string n3, float v3, string n4, float v4, string n5, float v5, string n6, float v6, string n7, float v7) : this(new string[] { n1, n2, n3, n4, n5, n6, n7 }, new float[] { v1, v2, v3, v4, v5, v6, v7 }) { }
+			public MaterialTCP2EnumDrawer(string n1, float v1, string n2, float v2, string n3, float v3, string n4, float v4, string n5, float v5, string n6, float v6, string n7, float v7, string n8, float v8) : this(new string[] { n1, n2, n3, n4, n5, n6, n7, n8 }, new float[] { v1, v2, v3, v4, v5, v6, v7, v8 }) { }
+			public MaterialTCP2EnumDrawer(string n1, float v1, string n2, float v2, string n3, float v3, string n4, float v4, string n5, float v5, string n6, float v6, string n7, float v7, string n8, float v8, string n9, float v9) : this(new string[] { n1, n2, n3, n4, n5, n6, n7, n8, n9 }, new float[] { v1, v2, v3, v4, v5, v6, v7, v8, v9 }) { }
+			public MaterialTCP2EnumDrawer(string n1, float v1, string n2, float v2, string n3, float v3, string n4, float v4, string n5, float v5, string n6, float v6, string n7, float v7, string n8, float v8, string n9, float v9, string n10, float v10) : this(new string[] { n1, n2, n3, n4, n5, n6, n7, n8, n9, n10 }, new float[] { v1, v2, v3, v4, v5, v6, v7, v8, v9, v10 }) { }
+			public MaterialTCP2EnumDrawer(string n1, float v1, string n2, float v2, string n3, float v3, string n4, float v4, string n5, float v5, string n6, float v6, string n7, float v7, string n8, float v8, string n9, float v9, string n10, float v10, string n11, float v11) : this(new string[] { n1, n2, n3, n4, n5, n6, n7, n8, n9, n10, n11 }, new float[] { v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11 }) { }
+			public MaterialTCP2EnumDrawer(string n1, float v1, string n2, float v2, string n3, float v3, string n4, float v4, string n5, float v5, string n6, float v6, string n7, float v7, string n8, float v8, string n9, float v9, string n10, float v10, string n11, float v11, string n12, float v12) : this(new string[] { n1, n2, n3, n4, n5, n6, n7, n8, n9, n10, n11, n12 }, new float[] { v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12 }) { }
+			public MaterialTCP2EnumDrawer(string n1, float v1, string n2, float v2, string n3, float v3, string n4, float v4, string n5, float v5, string n6, float v6, string n7, float v7, string n8, float v8, string n9, float v9, string n10, float v10, string n11, float v11, string n12, float v12, string n13, float v13) : this(new string[] { n1, n2, n3, n4, n5, n6, n7, n8, n9, n10, n11, n12, n13 }, new float[] { v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13 }) { }
+			public MaterialTCP2EnumDrawer(string n1, float v1, string n2, float v2, string n3, float v3, string n4, float v4, string n5, float v5, string n6, float v6, string n7, float v7, string n8, float v8, string n9, float v9, string n10, float v10, string n11, float v11, string n12, float v12, string n13, float v13, string n14, float v14) : this(new string[] { n1, n2, n3, n4, n5, n6, n7, n8, n9, n10, n11, n12, n13, n14 }, new float[] { v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14 }) { }
+			public MaterialTCP2EnumDrawer(string n1, float v1, string n2, float v2, string n3, float v3, string n4, float v4, string n5, float v5, string n6, float v6, string n7, float v7, string n8, float v8, string n9, float v9, string n10, float v10, string n11, float v11, string n12, float v12, string n13, float v13, string n14, float v14, string n15, float v15) : this(new string[] { n1, n2, n3, n4, n5, n6, n7, n8, n9, n10, n11, n12, n13, n14, n15 }, new float[] { v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15 }) { }
+			public MaterialTCP2EnumDrawer(string n1, float v1, string n2, float v2, string n3, float v3, string n4, float v4, string n5, float v5, string n6, float v6, string n7, float v7, string n8, float v8, string n9, float v9, string n10, float v10, string n11, float v11, string n12, float v12, string n13, float v13, string n14, float v14, string n15, float v15, string n16, float v16) : this(new string[] { n1, n2, n3, n4, n5, n6, n7, n8, n9, n10, n11, n12, n13, n14, n15, n16 }, new float[] { v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16 }) { }
+
+			public MaterialTCP2EnumDrawer(string[] enumNames, float[] vals)
+			{
+				this.names = new GUIContent[enumNames.Length];
+				for (int i = 0; i < enumNames.Length; i++)
+				{
+					this.names[i] = new GUIContent(enumNames[i]);
+				}
+				this.values = new float[vals.Length];
+				for (int j = 0; j < vals.Length; j++)
+				{
+					this.values[j] = vals[j];
+				}
+			}
+			public override float GetPropertyHeight(MaterialProperty prop, string label, MaterialEditor editor)
+			{
+				float result;
+				if (prop.type != MaterialProperty.PropType.Float && prop.type != MaterialProperty.PropType.Range)
+				{
+					result = 40f;
+				}
+				else
+				{
+					result = base.GetPropertyHeight(prop, label, editor);
+				}
+				return result;
+			}
+			public override void OnGUI(Rect position, MaterialProperty prop, GUIContent label, MaterialEditor editor)
+			{
+				if (prop.type != MaterialProperty.PropType.Float && prop.type != MaterialProperty.PropType.Range)
+				{
+					EditorGUI.HelpBox(position, "Enum used on a non-float property: " + prop.name, MessageType.Warning);
+				}
+				else
+				{
+					EditorGUI.BeginChangeCheck();
+					EditorGUI.showMixedValue = prop.hasMixedValue;
+					float floatValue = prop.floatValue;
+					int selectedIndex = -1;
+					for (int i = 0; i < this.values.Length; i++)
+					{
+						float num = this.values[i];
+						if (num == floatValue)
+						{
+							selectedIndex = i;
+							break;
+						}
+					}
+					int num2 = EditorGUI.Popup(position, label, selectedIndex, this.names);
+					EditorGUI.showMixedValue = false;
+					if (EditorGUI.EndChangeCheck())
+					{
+						prop.floatValue = this.values[num2];
+					}
+				}
+			}
+		}
 
 		//----------------------------------------------------------------------------------------------------------------------------------------------------------------
 		// Small texture field in material inspector

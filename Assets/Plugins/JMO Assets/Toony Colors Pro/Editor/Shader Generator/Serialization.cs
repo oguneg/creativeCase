@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Reflection;
+using System.Text;
 using UnityEngine;
 
 // Reflection-based serialization system: serialize simple value types, and specific classes (either those with the SerializeAs attribute, or special ones like Vector2, Vector3, ...)
@@ -17,7 +18,7 @@ namespace ToonyColorsPro
 			/// <summary>
 			/// Declare a class or field as serializable, and set its serialized short name
 			/// </summary>
-			[AttributeUsage(AttributeTargets.Field | AttributeTargets.Class)]
+			[AttributeUsage(AttributeTargets.Field | AttributeTargets.Class | AttributeTargets.Property)]
 			public class SerializeAsAttribute : Attribute
 			{
 				/// <summary>
@@ -39,6 +40,12 @@ namespace ToonyColorsPro
 			}
 
 			/// <summary>
+			/// Force serialization, regardless of the "conditionalField" attribute value
+			/// </summary>
+			[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
+			public class ForceSerializationAttribute : Attribute { }
+
+			/// <summary>
 			/// Declare a method as a callback to deserialize an object manually
 			/// </summary>
 			[AttributeUsage(AttributeTargets.Method)]
@@ -57,7 +64,7 @@ namespace ToonyColorsPro
 			}
 
 			//Will serialize an object as "type(field:value,field2:value,field3:value...)" provided that they have fields with the [SerializeAs] attribute
-			public static string Serialize(object obj)
+			public static string Serialize(object obj, FieldInfo objFieldInfo = null)
 			{
 				var output = "";
 
@@ -71,35 +78,52 @@ namespace ToonyColorsPro
 					var conditionalFieldName = serializedAsAttribute.conditionalField;
 					if (!string.IsNullOrEmpty(conditionalFieldName))
 					{
-						//try field
-						var conditionalField = obj.GetType().GetField(conditionalFieldName);
-						if (conditionalField != null)
+						var forceSerialization = objFieldInfo != null && ((Attribute[])objFieldInfo.GetCustomAttributes(typeof(ForceSerializationAttribute))).Length == 1;
+						if (!forceSerialization)
 						{
-							if (!(bool)conditionalField.GetValue(obj))
+							//try field
+							var conditionalField = obj.GetType().GetField(conditionalFieldName);
+							if (conditionalField != null)
 							{
-								return null;
-							}
-						}
-						else
-						{
-							//try property
-							var conditionalProperty = obj.GetType().GetProperty(conditionalFieldName);
-							if (conditionalProperty != null)
-							{
-								if (!(bool)conditionalProperty.GetValue(obj, null))
+								if (!(bool) conditionalField.GetValue(obj))
 								{
 									return null;
 								}
 							}
 							else
 							{
-								Debug.LogError(string.Format("Conditional field or property '{0}' doesn't exist for type '{1}'", conditionalFieldName, obj.GetType()));
+								//try property
+								var conditionalProperty = obj.GetType().GetProperty(conditionalFieldName);
+								if (conditionalProperty != null)
+								{
+									if (!(bool) conditionalProperty.GetValue(obj, null))
+									{
+										return null;
+									}
+								}
+								else
+								{
+									Debug.LogError(string.Format("Conditional field or property '{0}' doesn't exist for type '{1}'", conditionalFieldName, obj.GetType()));
+								}
 							}
 						}
 					}
 
 					var name = serializedAsAttribute.serializedName;
 					output = name + "(";
+				}
+
+				// properties with [SerializeAs] attribute
+				// note: only used for unityVersion currently; see Config.cs
+				var properties = new List<PropertyInfo>(obj.GetType().GetProperties(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public));
+				foreach (var prop in properties)
+				{
+					var attributes = prop.GetCustomAttributes(typeof(SerializeAsAttribute), true);
+					if (attributes != null && attributes.Length == 1)
+					{
+						var name = (attributes[0] as SerializeAsAttribute).serializedName;
+						output += string.Format("{0}:\"{1}\";", name, prop.GetValue(obj, null));
+					}
 				}
 
 				//get all fields, and look for [SerializeAs] attribute
@@ -117,7 +141,8 @@ namespace ToonyColorsPro
 						{
 							if (@object == null)
 							{
-								Debug.LogError("Serialization error!\nTrying to get the string value of a null object.");
+								// Debug.LogError("Serialization error!\nTrying to get the string value of a null object.");
+								return "__NULL__";
 							}
 
 							var type = @object.GetType();
@@ -148,7 +173,7 @@ namespace ToonyColorsPro
 								if (refAttributes != null && refAttributes.Length == 1)
 								{
 									//serializable
-									return Serialize(@object);
+									return Serialize(@object, field);
 								}
 
 								return null;
@@ -158,15 +183,43 @@ namespace ToonyColorsPro
 							{
 								return string.Format("\"{0}\"", @object);
 							}
+							
+							// unity vectors: prevent printing values with commas
+							if (type == typeof(Vector2))
+							{
+								var v2 = (Vector2) @object;
+								return string.Format(CultureInfo.InvariantCulture, "({0}, {1})", v2.x, v2.y);
+							}
+							if (type == typeof(Vector3))
+							{
+								var v3 = (Vector3) @object;
+								return string.Format(CultureInfo.InvariantCulture, "({0}, {1}, {2})", v3.x, v3.y, v3.z);
+							}
+							if (type == typeof(Vector4))
+							{
+								var v4 = (Vector4) @object;
+								return string.Format(CultureInfo.InvariantCulture, "({0}, {1}, {2}, {3})", v4.x, v4.y, v4.z, v4.w);
+							}
+							if (type == typeof(Color))
+							{
+								var c = (Color) @object;
+								return string.Format(CultureInfo.InvariantCulture, "RGBA({0}, {1}, {2}, {3})", c.r, c.g, c.b, c.a);
+								// return string.Format(CultureInfo.InvariantCulture, "{0}", c);
+							}
+							
 							//value type: just return the toString version
 							return string.Format(CultureInfo.InvariantCulture, "{0}", @object);
 						};
 
 						var val = GetStringValue(field.GetValue(obj));
-						if (val == null)
+						if (val == null) 
+						{
 							Debug.LogError(string.Format("Can't serialize this reference type: '{0}'\nFor field: '{1}'", field.FieldType, field.Name));
+						}
 						else
+						{
 							output += string.Format("{0}:{1};", name, val);
+						}
 					}
 				}
 
@@ -276,6 +329,12 @@ namespace ToonyColorsPro
 					//object types
 					if (!t.IsValueType && t != typeof(string))
 					{
+						// handle null values
+						if (strValue == "__NULL__")
+						{
+							return null;
+						}
+
 						//list
 						if (typeof(IList).IsAssignableFrom(t))
 						{
@@ -376,6 +435,12 @@ namespace ToonyColorsPro
 					//string: remove quotes to extract value
 					if (t == typeof(string))
 					{
+						// handle null values
+						if (strValue == "__NULL__")
+						{
+							return null;
+						}
+
 						return strValue.Trim('"');
 					}
 
@@ -437,7 +502,7 @@ namespace ToonyColorsPro
 				var insideBlock = 0;
 				var insideQuotes = false;
 				var i = 0;
-				var currentWord = "";
+				var currentWord = new StringBuilder();
 				var words = new List<string>();
 
 				//get opening/ending chars for blocks
@@ -467,20 +532,24 @@ namespace ToonyColorsPro
 
 					if (input[i] == separator && insideBlock == 0)
 					{
-						if (!removeEmptyEntries || currentWord != "")
-							words.Add(currentWord);
-						currentWord = "";
+						if (!removeEmptyEntries || currentWord.Length != 0)
+						{
+							words.Add(currentWord.ToString());
+						}
+						currentWord.Length = 0;
 					}
 					else
 					{
-						currentWord += input[i];
+						currentWord.Append(input[i]);
 					}
 
 					i++;
 				}
 
-				if (!removeEmptyEntries || currentWord != "")
-					words.Add(currentWord);
+				if (!removeEmptyEntries || currentWord.Length != 0)
+				{
+					words.Add(currentWord.ToString());
+				}
 
 				return words.ToArray();
 			}

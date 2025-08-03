@@ -1,5 +1,5 @@
 // Toony Colors Pro+Mobile 2
-// (c) 2014-2019 Jean Moreno
+// (c) 2014-2023 Jean Moreno
 
 // Shader Generator Module: Custom Ambient
 
@@ -10,12 +10,12 @@ sngl	lbl="Directional Ambient"		kw=DIRAMBIENT																tt="Manually set th
 mult	lbl="Space"					kw=World Space|,View Space|DIRAMBIENT_VIEW		needs=DIRAMBIENT	indent	tt="In which space is the directional ambient applied"
 #END
 
-//================================================================================================================================================================================================================================================================
+//================================================================
 
 #PROPERTIES_NEW
 #END
 
-//================================================================================================================================================================================================================================================================
+//================================================================
 
 #KEYWORDS
 /// IF CUBE_AMBIENT
@@ -23,7 +23,7 @@ mult	lbl="Space"					kw=World Space|,View Space|DIRAMBIENT_VIEW		needs=DIRAMBIEN
 ///
 #END
 
-//================================================================================================================================================================================================================================================================
+//================================================================
 
 #PROPERTIES_BLOCK
 /// IF CUBE_AMBIENT
@@ -40,12 +40,34 @@ mult	lbl="Space"					kw=World Space|,View Space|DIRAMBIENT_VIEW		needs=DIRAMBIEN
 ///
 #END
 
-//================================================================================================================================================================================================================================================================
+//================================================================
 
-#VARIABLES
+#FUNCTIONS
+/// IF DIRAMBIENT
+
+	half3 DirAmbient (half3 normal)
+	{
+		fixed3 retColor =
+			saturate( normal.x * _TCP2_AMBIENT_RIGHT.rgb) +
+			saturate(-normal.x * _TCP2_AMBIENT_LEFT.rgb) +
+			saturate( normal.y * _TCP2_AMBIENT_TOP.rgb) +
+			saturate(-normal.y * _TCP2_AMBIENT_BOTTOM.rgb) +
+			saturate( normal.z * _TCP2_AMBIENT_FRONT.rgb) +
+			saturate(-normal.z * _TCP2_AMBIENT_BACK.rgb);
+		return retColor * 2.0;
+	}
+///
+#END
+
+//================================================================
+
+#VARIABLES_OUTSIDE_CBUFFER
 /// IF CUBE_AMBIENT
 	samplerCUBE _AmbientCube;
 ///
+#END
+
+#VARIABLES
 /// IF DIRAMBIENT
 	fixed4 _TCP2_AMBIENT_RIGHT;
 	fixed4 _TCP2_AMBIENT_LEFT;
@@ -53,32 +75,20 @@ mult	lbl="Space"					kw=World Space|,View Space|DIRAMBIENT_VIEW		needs=DIRAMBIEN
 	fixed4 _TCP2_AMBIENT_BOTTOM;
 	fixed4 _TCP2_AMBIENT_FRONT;
 	fixed4 _TCP2_AMBIENT_BACK;
-	
-	half3 DirAmbient (half3 normal)
-	{
-		fixed3 retColor =
-			saturate( normal.x * _TCP2_AMBIENT_RIGHT) +
-			saturate(-normal.x * _TCP2_AMBIENT_LEFT) +
-			saturate( normal.y * _TCP2_AMBIENT_TOP) +
-			saturate(-normal.y * _TCP2_AMBIENT_BOTTOM) +
-			saturate( normal.z * _TCP2_AMBIENT_FRONT) +
-			saturate(-normal.z * _TCP2_AMBIENT_BACK);
-		return retColor * UNITY_LIGHTMODEL_AMBIENT.a;
-	}
 ///
 #END
 
-//================================================================================================================================================================================================================================================================
+//================================================================
 
 #INPUT
 #END
 
-//================================================================================================================================================================================================================================================================
+//================================================================
 
 #VERTEX
 #END
 
-//================================================================================================================================================================================================================================================================
+//================================================================
 
 #FRAGMENT(float3 ambient, float3 worldNormal)
 /// IF CUBE_AMBIENT

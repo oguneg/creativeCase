@@ -1,6 +1,4 @@
-﻿// Upgrade NOTE: upgraded instancing buffer 'Props' to new syntax.
-
-// Toony Colors Pro+Mobile 2
+﻿// Toony Colors Pro+Mobile 2
 // (c) 2014-2019 Jean Moreno
 
 Shader "Toony Colors Pro 2/Examples/Cat Demo/Ground"
@@ -228,7 +226,10 @@ Shader "Toony Colors Pro 2/Examples/Cat Demo/Ground"
 			float3 albedoHsv = rgb2hsv(s.Albedo.rgb);
 			albedoHsv += float3(_Shadow_HSV_H/360,_Shadow_HSV_S,_Shadow_HSV_V);
 			s.Albedo = lerp(hsv2rgb(albedoHsv), s.Albedo, ramp);
-		#if !defined(UNITY_PASS_FORWARDBASE)
+		// Note: we consider that a directional light with a cookie is supposed to be the main one (even though Unity renders it as an additional light).
+		// Thus when using a main directional light AND another directional light with a cookie, then the shadow color might be applied twice.
+		// You can remove the DIRECTIONAL_COOKIE check below the prevent that.
+		#if !defined(UNITY_PASS_FORWARDBASE) && !defined(DIRECTIONAL_COOKIE)
 			_SColor = fixed4(0,0,0,1);
 		#endif
 			_SColor = lerp(_HColor, _SColor, _SColor.a);	//Shadows intensity through alpha

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using DG.Tweening;
+using UnityEngine.Video;
 public class BlockHandler : MonoBehaviour
 {
     bool isAlive = true;
@@ -12,7 +13,9 @@ public class BlockHandler : MonoBehaviour
     {
         if (!isAlive) return;
         health--;
-        transform.DOScale(0.05f, 0.075f).SetLoops(2,LoopType.Yoyo).SetRelative().SetEase(Ease.InOutBack);
+        transform.DOKill();
+        transform.localScale = Vector3.one;
+        transform.DOScale(1.03f, 0.075f).SetLoops(2,LoopType.Yoyo).SetEase(Ease.InOutBack);
         if (health == 0)
         {
             isAlive = false;
