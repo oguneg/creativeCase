@@ -10,7 +10,7 @@ public class MobHandler : MonoBehaviour
     private Vector3 target;
     const float speed = 5f;
     private bool canMultiply = false;
-    [SerializeField] private Rigidbody rb;
+    [SerializeField] private Rigidbody2D rb;
     public void Initialize(bool isMultiplied = false)
     {
         canMultiply = !isMultiplied;
@@ -35,7 +35,7 @@ public class MobHandler : MonoBehaviour
         canMultiply = true;
     }
 
-    private void OnTriggerEnter(Collider col)
+    private void OnTriggerEnter2D(Collider2D col)
     {
         if (!isPlayer)
         {
@@ -61,7 +61,7 @@ public class MobHandler : MonoBehaviour
         }
     }
 
-    private void OnCollisionEnter(Collision other)
+    private void OnCollisionEnter2D(Collision2D other)
     {
         if (isPlayer && other.gameObject.CompareTag("Enemy"))
         {
