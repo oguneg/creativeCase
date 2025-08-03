@@ -4,15 +4,31 @@ using UnityEngine;
 
 public class EnemyBaseHandler : MonoBehaviour
 {
-    // Start is called before the first frame update
+    [SerializeField] private float spawnInterval;
+    [SerializeField] private int spawnBatchSize;
     void Start()
     {
-        
+        StartCoroutine(SpawnRoutine());
     }
 
-    // Update is called once per frame
-    void Update()
+    private IEnumerator SpawnRoutine()
     {
-        
+        var wfs = new WaitForSeconds(spawnInterval);
+        while (true)
+        {
+            yield return wfs;
+            Spawn();
+        }
+    }
+
+    private void Spawn()
+    {
+        for (int i = 0; i < spawnBatchSize; i++)
+        {
+        var mob = GameManager.instance.SpawnMob(true);
+        mob.transform.position = transform.position + new Vector3(Random.Range(-1,1),0,Random.Range(-1,1));
+        mob.transform.rotation = transform.rotation;
+        mob.Initialize();
+        }
     }
 }

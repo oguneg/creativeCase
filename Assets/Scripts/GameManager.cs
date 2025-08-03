@@ -5,7 +5,7 @@ using UnityEngine;
 public class GameManager : MonoSingleton<GameManager>
 {
     [SerializeField] InputHandler inputHandler;
-    [SerializeField] private MobHandler mobPrefab;
+    [SerializeField] private MobHandler mobPrefab,enemyPrefab;
     [SerializeField] private Transform enemyBase, playerBase;
 
     private List<MobHandler> activeMobList = new List<MobHandler>();
@@ -38,8 +38,8 @@ public class GameManager : MonoSingleton<GameManager>
 
     public MobHandler SpawnMob(bool isEnemy = false)
     {
-        if (mobCount > 1000) return null;
-        var mob = Instantiate(mobPrefab);
+        //if (mobCount > 1000) return null;
+        var mob = Instantiate(isEnemy ? enemyPrefab: mobPrefab);
         mob.SetTarget(isEnemy ? playerBase.transform.position : enemyBase.transform.position);
         AddMob(mob);
         return mob;

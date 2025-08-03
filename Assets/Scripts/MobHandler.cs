@@ -37,6 +37,7 @@ public class MobHandler : MonoBehaviour
 
     private void OnTriggerEnter(Collider col)
     {
+        if (!isPlayer) return;
         if (canMultiply && col.CompareTag("Gate"))
         {
             col.GetComponent<MultiplierGateHandler>().Multiply(this);
@@ -46,5 +47,21 @@ public class MobHandler : MonoBehaviour
         {
             col.GetComponentInParent<TubeController>().SwallowMob(this);
         }
+    }
+
+    private void OnCollisionEnter(Collision other)
+    {
+        if (isPlayer && other.gameObject.CompareTag("Enemy"))
+        {
+            Die();
+            other.collider.GetComponent<MobHandler>().Die();
+        }
+    }
+
+    public void Die()
+    {
+        gameObject.SetActive(false);
+        GameManager.instance.KillMob(this);
+        Destroy(this);
     }
 }
