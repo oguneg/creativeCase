@@ -6,6 +6,7 @@ using Unity.VisualScripting;
 using UnityEngine.Video;
 public class MobHandler : MonoBehaviour
 {
+    private bool isAlive = true;
     public bool isPlayer;
     private Vector3 target;
     const float speed = 6f;
@@ -52,6 +53,7 @@ public class MobHandler : MonoBehaviour
 
         else if (col.CompareTag("SplineEntrance"))
         {
+            if (!isAlive) return;
             col.GetComponentInParent<TubeController>().SwallowMob(this);
         }
         else if (col.CompareTag("EnemyBase"))
@@ -77,6 +79,7 @@ public class MobHandler : MonoBehaviour
 
     public void Die()
     {
+        isAlive = false;
         GameManager.instance.KillMob(this);
         Destroy(gameObject);
     }

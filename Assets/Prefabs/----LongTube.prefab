@@ -116,14 +116,14 @@ MonoBehaviour:
     useClippedPercent: 0
     keys: []
   _clipFromSample:
-    position: {x: 0.0030983686, y: 0.21311808, z: 12.196709}
+    position: {x: 0.0030983686, y: 0.21311808, z: -2.403292}
     up: {x: 0, y: 1, z: 0}
     forward: {x: -0.00006656284, y: 0.0065978933, z: 0.99997824}
     color: {r: 1, g: 1, b: 1, a: 1}
     size: 1
     percent: 0
   _clipToSample:
-    position: {x: 4.371625, y: 0.18639272, z: 63.576183}
+    position: {x: 4.371625, y: 0.18639272, z: 48.976185}
     up: {x: 0, y: 1, z: 0}
     forward: {x: -0.81373054, y: -0.034917425, z: 0.5801925}
     color: {r: 1, g: 1, b: 1, a: 1}
@@ -1166,7 +1166,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6039874228024937632}
-  - {fileID: 572979762507824131}
   m_Father: {fileID: 5782843589237681938}
   m_LocalEulerAnglesHint: {x: 90, y: -41.58, z: 0}
 --- !u!114 &2574786918965752643
@@ -1575,6 +1574,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1055701043814559299}
+  - {fileID: 572979762507824131}
   - {fileID: 7509995456846292329}
   - {fileID: 289276151276085876}
   m_Father: {fileID: 0}
@@ -5511,10 +5511,10 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8805371443497994017}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.70708096, y: 0.0060471743, z: -0.0060471743, w: 0.70708096}
-  m_LocalPosition: {x: -0.034116104, y: -0.31761828, z: 0.10125015}
-  m_LocalScale: {x: 1.25, y: 1.2499996, z: 1.2499996}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.38, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 289276151276085876}
+  m_Father: {fileID: 5782843589237681938}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
