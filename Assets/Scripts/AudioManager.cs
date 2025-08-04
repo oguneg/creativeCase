@@ -5,7 +5,7 @@ using UnityEngine;
 public class AudioManager : MonoSingleton<AudioManager>
 {
     [SerializeField] private AudioSource audioSource;
-    [SerializeField] private AudioClip spawnClip, combatClip, tubeClip;
+    [SerializeField] private AudioClip spawnClip, combatClip, tubeClip, wonClip, lossClip;
     public void PlaySpawn()
     {
         audioSource.PlayOneShot(spawnClip);
@@ -19,5 +19,15 @@ public class AudioManager : MonoSingleton<AudioManager>
     public void PlayTube()
     {
         audioSource.PlayOneShot(tubeClip);
+    }
+
+    public void PlayWon()
+    {
+        audioSource.PlayOneShot(wonClip);
+    }
+
+    public void PlayLoss()
+    {
+        audioSource.PlayOneShot(lossClip);
     }
 }

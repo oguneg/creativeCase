@@ -63,11 +63,11 @@ public class GameManager : MonoSingleton<GameManager>
 
     public void Defeat()
     {
-        Debug.Log("you lost");
+        UIManager.instance.CompleteGame(false);
     }
 
     public void Win()
     {
-        Debug.Log("you won");
+        UIManager.instance.CompleteGame(true);
     }
 }
