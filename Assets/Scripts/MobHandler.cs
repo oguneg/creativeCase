@@ -58,6 +58,7 @@ public class MobHandler : MonoBehaviour
         else if (col.CompareTag("SplineEntrance"))
         {
             if (!isAlive) return;
+            AudioManager.instance.PlayTube();
             col.GetComponentInParent<TubeController>().SwallowMob(this);
         }
         else if (col.CompareTag("EnemyBase"))
@@ -77,6 +78,7 @@ public class MobHandler : MonoBehaviour
         if (isPlayer && other.gameObject.CompareTag("Enemy"))
         {
             other.collider.GetComponent<MobHandler>().Die();
+            AudioManager.instance.PlayCombat();
             Die();
         }
     }

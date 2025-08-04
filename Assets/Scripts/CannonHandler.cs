@@ -16,8 +16,10 @@ public class CannonHandler : MonoBehaviour
     [SerializeField] private float moveSpeed, moveBoundX;
     [SerializeField] private Transform[] wheels;
     [SerializeField] private Transform spawnPoint;
+    AudioManager audioManager;
     void Awake()
     {
+        audioManager = AudioManager.instance;
         gameManager = GameManager.instance;
         lastX = transform.position.x;
     }
@@ -51,6 +53,7 @@ public class CannonHandler : MonoBehaviour
         cannonVisual.DOScale(0.08f, 0.075f).SetRelative().SetLoops(2, LoopType.Yoyo).SetEase(Ease.InOutSine);
         cannonVisual.DOMoveZ(-0.35f, 0.075f).SetRelative().SetLoops(2, LoopType.Yoyo).SetEase(Ease.InOutSine);
         SpawnMob();
+        audioManager.PlaySpawn();
     }
 
     private void SpawnMob()
