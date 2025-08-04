@@ -9,7 +9,7 @@ public class GameManager : MonoSingleton<GameManager>
     [SerializeField] private MobHandler mobPrefab, enemyPrefab;
     [SerializeField] private Transform enemyBase, playerBase;
     [SerializeField] private ParticleSystem smokeParticle;
-
+    bool isGameComplete = false;
     private List<MobHandler> activeMobList = new List<MobHandler>();
     [SerializeField] int mobCount = 0;
     void Start()
@@ -63,11 +63,15 @@ public class GameManager : MonoSingleton<GameManager>
 
     public void Defeat()
     {
+        if (isGameComplete) return;
+        isGameComplete = true;
         UIManager.instance.CompleteGame(false);
     }
 
     public void Win()
     {
+        if (isGameComplete) return;
+        isGameComplete = true;
         UIManager.instance.CompleteGame(true);
     }
 }

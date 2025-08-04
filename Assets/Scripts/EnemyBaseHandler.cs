@@ -31,7 +31,7 @@ public class EnemyBaseHandler : MonoBehaviour
         for (int i = 0; i < spawnBatchSize; i++)
         {
             var mob = GameManager.instance.SpawnMob(true);
-            mob.transform.position = transform.position + new Vector3(Random.Range(-1f, 1f), 0, Random.Range(-1f, 1f));
+            mob.transform.position = transform.position + new Vector3(Random.Range(-1.5f, 1.5f), 0, Random.Range(-1f, 1f));
             mob.transform.rotation = transform.rotation;
             mob.Initialize();
         }

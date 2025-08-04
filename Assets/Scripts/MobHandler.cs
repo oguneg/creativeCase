@@ -48,6 +48,10 @@ public class MobHandler : MonoBehaviour
             {
                 GameManager.instance.Defeat();
             }
+            else if (col.CompareTag("KillSweeper"))
+            {
+                Die();
+            }
         }
         else
         if (canMultiply && col.CompareTag("Gate"))
@@ -66,7 +70,7 @@ public class MobHandler : MonoBehaviour
             col.GetComponentInParent<EnemyBaseHandler>().Damage();
             Die();
         }
-                else if (col.CompareTag("Block"))
+        else if (col.CompareTag("Block"))
         {
             col.GetComponentInParent<BlockHandler>().Damage();
             Die();

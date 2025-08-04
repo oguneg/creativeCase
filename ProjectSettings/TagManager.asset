@@ -11,6 +11,8 @@ TagManager:
   - PlayerLine
   - EnemyBase
   - Block
+  - Missile
+  - KillSweeper
   layers:
   - Default
   - TransparentFX
