@@ -12,12 +12,16 @@ public class MobHandler : MonoBehaviour
     const float speed = 6f;
     private bool canMultiply = false;
     [SerializeField] private Rigidbody rb;
+    [SerializeField] private SkinnedMeshRenderer smRenderer;
+    [SerializeField] private Material deadMat;
+    [SerializeField] private Collider col;
     public void Initialize(bool isMultiplied = false)
     {
         canMultiply = !isMultiplied;
         if (isMultiplied) StartCoroutine(MultiplyCooldown());
         //target = transform.position + Vector3.forward * 200;
         transform.DOScale(1f, 0.3f).SetEase(Ease.OutBounce);
+        GameManager.instance.PlayParticleAt(transform.position);
     }
 
     public void SetTarget(Vector3 pos)
@@ -80,7 +84,11 @@ public class MobHandler : MonoBehaviour
     public void Die()
     {
         isAlive = false;
+        col.enabled = false;
         GameManager.instance.KillMob(this);
-        Destroy(gameObject);
+        smRenderer.sharedMaterial = deadMat;
+        rb.isKinematic = true;
+        transform.DOMoveY(-3, 0.25f).SetEase(Ease.InBack).OnComplete(()=>Destroy(gameObject));
+        //Destroy(gameObject);
     }
 }

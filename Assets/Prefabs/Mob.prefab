@@ -134,6 +134,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isPlayer: 1
   rb: {fileID: 6331390912858128928}
+  smRenderer: {fileID: 8282445393463175803}
+  deadMat: {fileID: 2100000, guid: b77ee3b756b9095468bd4c6dad966eeb, type: 2}
+  col: {fileID: 3907746320833519515}
 --- !u!54 &6331390912858128928
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -337,5 +340,10 @@ PrefabInstance:
 --- !u!4 &2614556004827081022 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 0bf003a2b574b1b46986af83df5bb5e6, type: 3}
+  m_PrefabInstance: {fileID: 2576760097445793493}
+  m_PrefabAsset: {fileID: 0}
+--- !u!137 &8282445393463175803 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -3372257567545154386, guid: 0bf003a2b574b1b46986af83df5bb5e6, type: 3}
   m_PrefabInstance: {fileID: 2576760097445793493}
   m_PrefabAsset: {fileID: 0}

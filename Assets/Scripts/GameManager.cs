@@ -8,6 +8,7 @@ public class GameManager : MonoSingleton<GameManager>
     [SerializeField] InputHandler inputHandler;
     [SerializeField] private MobHandler mobPrefab, enemyPrefab;
     [SerializeField] private Transform enemyBase, playerBase;
+    [SerializeField] private ParticleSystem smokeParticle;
 
     private List<MobHandler> activeMobList = new List<MobHandler>();
     [SerializeField] int mobCount = 0;
@@ -51,6 +52,13 @@ public class GameManager : MonoSingleton<GameManager>
         mob.SetTarget(isEnemy ? playerBase.transform.position : enemyBase.transform.position);
         AddMob(mob);
         return mob;
+    }
+
+    public void PlayParticleAt(Vector3 position)
+    {
+        var particle = Instantiate(smokeParticle);
+        particle.transform.position = position;
+        particle.Play();
     }
 
     public void Defeat()

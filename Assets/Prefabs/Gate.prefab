@@ -343,6 +343,9 @@ MonoBehaviour:
   maxX: 0
   moveSpeed: 0
   multiplierText: {fileID: 2645331030888519563}
+  image: {fileID: 1036522639602366985}
+  gateColor: {r: 0.5137255, g: 0, b: 0.7058824, a: 1}
+  gateMultiplyColor: {r: 0.35588345, g: 0, b: 0.48900002, a: 1}
 --- !u!1 &4007344657381037220
 GameObject:
   m_ObjectHideFlags: 0

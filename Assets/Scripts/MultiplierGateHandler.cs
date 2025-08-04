@@ -4,15 +4,23 @@ using UnityEngine;
 using TMPro;
 using DG.Tweening;
 using UnityEngine.Video;
+using UnityEngine.UI;
 public class MultiplierGateHandler : MonoBehaviour
 {
     [SerializeField] private int multiplier;
     [SerializeField] private bool isMoving;
     [SerializeField] private float minX, maxX, moveSpeed;
     [SerializeField] private TextMeshProUGUI multiplierText;
+    [SerializeField] private Image image;
+
+    [SerializeField] private Color gateColor, gateMultiplyColor;
+
+    private Vector3 initialScale, targetScale;
 
     void Start()
     {
+        initialScale = multiplierText.transform.localScale;
+        targetScale = initialScale * 1.1f;
         multiplierText.text = $"x{multiplier}";
         if (isMoving)
         {
@@ -26,11 +34,17 @@ public class MultiplierGateHandler : MonoBehaviour
 
     public void Multiply(MobHandler mob)
     {
-        for (int i = 0; i < multiplier-1; i++)
+        for (int i = 0; i < multiplier - 1; i++)
         {
             var newMob = GameManager.instance.SpawnMob();
-            newMob.transform.position = mob.transform.position + new Vector3(Random.Range(-0.1f,0.1f),0,Random.Range(-0.1f,0.1f));
+            newMob.transform.position = mob.transform.position + new Vector3(Random.Range(-0.1f, 0.1f), 0, Random.Range(-0.1f, 0.1f));
             newMob.Initialize(true);
         }
+
+
+        multiplierText.transform.localScale = initialScale;
+        multiplierText.transform.DOScale(targetScale, 0.075f).SetLoops(2, LoopType.Yoyo).SetEase(Ease.InOutBack);
+        image.color = gateColor;
+        image.DOColor(gateMultiplyColor, 0.1f).SetLoops(2, LoopType.Yoyo).SetEase(Ease.InOutBack);
     }
 }
