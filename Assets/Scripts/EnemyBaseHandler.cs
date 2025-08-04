@@ -13,6 +13,7 @@ public class EnemyBaseHandler : MonoBehaviour
     void Start()
     {
         StartCoroutine(SpawnRoutine());
+        healthText.text = $"{health}";
     }
 
     private IEnumerator SpawnRoutine()

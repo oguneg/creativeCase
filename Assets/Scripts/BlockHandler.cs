@@ -9,13 +9,19 @@ public class BlockHandler : MonoBehaviour
     bool isAlive = true;
     [SerializeField] private int health;
     [SerializeField] private TextMeshProUGUI healthText;
+
+    void Start()
+    {
+        healthText.text = $"{health}";
+    }
+
     public void Damage()
     {
         if (!isAlive) return;
         health--;
         transform.DOKill();
         transform.localScale = Vector3.one;
-        transform.DOScale(1.03f, 0.075f).SetLoops(2,LoopType.Yoyo).SetEase(Ease.InOutBack);
+        transform.DOScale(1.03f, 0.075f).SetLoops(2, LoopType.Yoyo).SetEase(Ease.InOutBack);
         if (health == 0)
         {
             isAlive = false;
